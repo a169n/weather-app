@@ -1,0 +1,41 @@
+body {
+  font-family: 'Montserrat', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-image: url(../pictures/map-of-the-world-earth.jpg);
+  background-size: cover;
+}
+
+#app {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.input-container {
+  margin-bottom: 20px;
+}
+
+.input-container label,
+.input-container input {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.button-container button {
+  margin-right: 10px;
+}
+
+#map {
+  height: 300px;
+  margin-top: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+#weather-info {
+  margin-top: 20px;
+}

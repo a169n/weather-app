@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+  <!-- Google Fonts (Montserrat) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- CSS -->
+  <link rel="stylesheet" href="./css/style.css">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+
+<body>
+  <div id="app">
+    <div class="input-container">
+      <label for="city">City:</label>
+      <input type="text" id="city" name="city" placeholder="Enter city name">
+      <label for="lat">Latitude:</label>
+      <input type="number" id="lat" name="lat" placeholder="55.7558">
+      <label for="lon">Longitude:</label>
+      <input type="number" id="lon" name="lon" placeholder="37.6173">
+    </div>
+    <div class="button-container">
+      <button type="button" onclick="getWeatherByCity()">Get Weather by City</button>
+      <button type="button" onclick="getWeatherByCoordinates()">Get Weather by Coordinates</button>
+      <button type="button" onclick="getCurrentLocationWeather()">Get Current Location Weather</button>
+      <button type="button" onclick="selectCityOnMap()">Select City on Map</button>
+    </div>
+    <div id="weather-info"></div>
+    <div id="map-container">
+      <div id="map"></div>
+    </div>
+  </div>
+
+  <script src="./js/main.js"></script>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</body>
+
+</html>
