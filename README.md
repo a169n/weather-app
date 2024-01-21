@@ -109,7 +109,7 @@ Before running the application, make sure you have the following:
 
 ## Lisence
 
-Copy and paste this content into a file named `README.md` in your project's root directory.
+Free to use ;)
 
 
   
