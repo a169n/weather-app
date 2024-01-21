@@ -1,35 +1,101 @@
 let map;
+let timeInterval;
 
 async function getWeather(lat, lon, city) {
-  const response = await fetch(`/weather?lat=${lat}&lon=${lon}`);
-  const data = await response.json();
+  try {
+    clearInterval(timeInterval);
 
-  const temperatureCelsius = data.main.temp - 273.15;
-  const feelsLikeCelsius = data.main.feels_like - 273.15;
+    const response = await fetch(`/weather?lat=${lat}&lon=${lon}`);
+    const weatherData = await response.json();
 
-  const weatherInfo = document.getElementById("weather-info");
-  weatherInfo.innerHTML = `
-    <p>City: ${data.name}</p>
-    <p>Temperature: ${temperatureCelsius.toFixed(2)}°C</p>
-    <p>Description: ${data.weather[0].description}</p>
-    <img src="http://openweathermap.org/img/wn/${
-      data.weather[0].icon
-    }.png" alt="Weather Icon">
-    <p>Coordinates: ${data.coord.lat}, ${data.coord.lon}</p>
-    <p>Feels Like: ${feelsLikeCelsius.toFixed(2)}°C</p>
-    <p>Humidity: ${data.main.humidity}%</p>
-    <p>Pressure: ${data.main.pressure} hPa</p>
-    <p>Wind Speed: ${data.wind.speed} m/s</p>
-    <p>Country Code: ${data.sys.country}</p>
-    <p>Rain Volume (last 3 hours): ${data.rain ? data.rain["1h"] : 0} mm</p>
-  `;
+    const temperatureCelsius = weatherData.main.temp - 273.15;
+    const feelsLikeCelsius = weatherData.main.feels_like - 273.15;
 
-  showMap("map", data.coord.lat, data.coord.lon, data.name);
+    const timestamp = weatherData.dt;
+    const timezoneResponse = await fetch(
+      `/timezone?lat=${lat}&lon=${lon}&timestamp=${timestamp}`
+    );
+    const timezoneData = await timezoneResponse.json();
 
-  const prompt = data.weather[0].description + ' ' + data.name + ' in ' + data.sys.country;
-  console.log(prompt);
+    const timezone = timezoneData.zoneName;
 
-  changeBackgroundImage([prompt]);
+    const date = new Date(timestamp * 1000);
+    const formattedDate = date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      timeZone: timezone,
+    });
+
+    const weatherInfo = document.getElementById("weather-info");
+    weatherInfo.innerHTML = `
+      <div class="weather-card">
+        <p>City: ${weatherData.name}</p>
+        <p>Temperature: ${temperatureCelsius.toFixed(2)}°C</p>
+        <p>Description: ${weatherData.weather[0].description}</p>
+        <img src="http://openweathermap.org/img/wn/${
+          weatherData.weather[0].icon
+        }.png" alt="Weather Icon">
+        <p>Coordinates: ${weatherData.coord.lat}, ${weatherData.coord.lon}</p>
+        <p>Feels Like: ${feelsLikeCelsius.toFixed(2)}°C</p>
+        <p>Humidity: ${weatherData.main.humidity}%</p>
+        <p>Pressure: ${weatherData.main.pressure} hPa</p>
+        <p>Wind Speed: ${weatherData.wind.speed} m/s</p>
+        <p>Country Code: ${weatherData.sys.country}</p>
+        <p>Rain Volume (last 3 hours): ${
+          weatherData.rain ? weatherData.rain["1h"] : 0
+        } mm</p>
+        <p>Air Quality Index: ${weatherData.airQualityIndex || "N/A"}</p>
+        <p>Date: ${formattedDate}</p>
+        <p id="current-time"></p> <!-- Placeholder for current time -->
+        <p>Timezone: ${timezone}</p>
+      </div>
+    `;
+
+    showMap(
+      "map",
+      weatherData.coord.lat,
+      weatherData.coord.lon,
+      weatherData.name,
+      timezone
+    );
+
+    const prompt =
+      weatherData.weather[0].description +
+      " in " +
+      weatherData.name +
+      " city " +
+      weatherData.sys.country;
+
+    changeBackgroundImage(prompt, timezone);
+
+    const currentTimeElement = document.getElementById("current-time");
+    timeInterval = setInterval(() => {
+      const currentTime = new Date().toLocaleTimeString(undefined, {
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+        timeZone: timezone,
+        hour12: true,
+      });
+      currentTimeElement.textContent = `Current Time: ${currentTime}`;
+    }, 1000);
+  } catch (error) {
+    console.error("Error fetching weather data:", error);
+  }
+}
+
+async function getTimezone(lat, lon, timestamp) {
+  try {
+    const response = await fetch(
+      `/timezone?lat=${lat}&lon=${lon}&timestamp=${timestamp}`
+    );
+    const timezoneData = await response.json();
+
+    console.log("Timezone Data:", timezoneData);
+  } catch (error) {
+    console.error("Error fetching timezone data:", error);
+  }
 }
 
 async function getWeatherByCity() {
@@ -119,13 +185,12 @@ function selectCityOnMap() {
 
 function changeBackgroundImage(description) {
   fetch(`/background?description=${encodeURIComponent(description)}`)
-    .then(response => response.json())
-    .then(data => {
+    .then((response) => response.json())
+    .then((data) => {
       const backgroundImageUrl = data.urls.regular;
       document.body.style.backgroundImage = `url(${backgroundImageUrl})`;
     })
-    .catch(error => {
-      console.error('Error fetching background image:', error);
+    .catch((error) => {
+      console.error("Error fetching background image:", error);
     });
 }
-
