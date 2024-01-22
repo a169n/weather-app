@@ -85,3 +85,30 @@ body {
   height: auto;
   margin-top: 10px;
 }
+
+.footer {
+  display: flex;
+  align-items: self-start;
+  justify-content: center;
+  gap: 250px;
+  height: auto;
+  padding: 15px 120px;
+  margin-top: 36px;
+  border-top:solid black 2px;
+  background-color: #fff;
+}
+
+.footer a {
+  text-decoration: none;
+  color: blue;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+}
+
+.links a {
+  margin: 5px 0;
+
+}

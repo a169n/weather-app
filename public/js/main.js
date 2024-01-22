@@ -159,7 +159,7 @@ function showMap(containerId, lat, lon, cityName) {
   if (!map) {
     map = L.map(containerId).setView([lat, lon], 10);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "© OpenStreetMap contributors",
+      attribution: "Talgatov Aibyn",
     }).addTo(map);
   }
 
