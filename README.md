@@ -46,7 +46,7 @@ Before running the application, make sure you have the following:
 
 1. **Start the server**
     ```bash
-       npm run server
+    npm run server
     
 **The server will be running at http://localhost:3000**
 
