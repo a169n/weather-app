@@ -96,7 +96,7 @@ app.get("/timezone", async (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  const { name, email, password, confirmPassword } = req.body;
+  const { name, email, password, confirmPassword, city, latitude, longitude, weatherData } = req.body;
 
   if (password !== confirmPassword) {
     return res.status(400).json({ error: "Passwords do not match" });
@@ -107,13 +107,20 @@ app.post("/register", async (req, res) => {
     const existingEmail = await User.findOne({ name });
 
     if (existingUser || existingEmail) {
-      alert("User is already registered");
       return res.status(400).json({ error: "User is already registered" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await User.create({ name, email, password: hashedPassword });
+    await User.create({ 
+      name, 
+      email, 
+      password: hashedPassword, 
+      city,
+      latitude,
+      longitude,
+      weatherData
+    });
 
     res.status(201).json({ message: "Registration successful" });
   } catch (error) {
@@ -123,10 +130,10 @@ app.post("/register", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email: username });
+    const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(401).json({ success: false, error: "Username not found" });
@@ -138,7 +145,11 @@ app.post("/login", async (req, res) => {
       return res.status(401).json({ success: false, error: "Username or password does not match" });
     }
 
-    res.status(200).json({ success: true, redirectUrl: "/weather.html" });
+    res.status(200).json({ 
+      success: true, 
+      username: user.name, 
+      redirectUrl: "/weather.html?username=" + user.name 
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: "Server error" });
@@ -156,7 +167,44 @@ app.get("/users", async (req, res) => {
   }
 });
 
-app.delete("/users/delete", async (req, res) => {
+app.post('/users/:username/weather', async (req, res) => {
+  const { username } = req.params;
+  const { city, latitude, longitude, weather, timestamp } = req.body;
+
+  try {
+    const user = await User.findOne({ name: username });
+
+    user.weatherData.push({ city, latitude, longitude, weather, timestamp });
+    await user.save();
+
+    res.status(200).json({ message: 'Weather data saved successfully' });
+  } catch (error) {
+    console.error('Error saving weather data to user:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.post("/users/:userId/admin", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findOne({ _id: userId });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    user.isAdmin = true;
+    await user.save();
+
+    res.status(200).json({ message: `User ${user.name} is now Admin` });
+  } catch (error) {
+    console.error("Error making user admin:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.delete("/users", async (req, res) => {
   try {
     await User.deleteMany();
     res.status(200).json({ message: "All users deleted successfully" });
@@ -165,6 +213,21 @@ app.delete("/users/delete", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+app.delete("/users/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deletedUser = await User.findByIdAndDelete(id);
+    if (!deletedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 
 const port = process.env.PORT || 3000;
 

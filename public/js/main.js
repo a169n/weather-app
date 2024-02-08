@@ -1,15 +1,15 @@
 let map;
 let timeInterval;
 
-async function getWeather(lat, lon, city) {
+async function getWeather(lat, lon, city, saveData = false) {
   try {
     clearInterval(timeInterval);
 
     const response = await fetch(`/weather?lat=${lat}&lon=${lon}`);
     const weatherData = await response.json();
 
-    const temperatureCelsius = weatherData.main.temp - 273.15;
-    const feelsLikeCelsius = weatherData.main.feels_like - 273.15;
+    const temperatureCelsius = (weatherData.main.temp - 273.15).toFixed(2);
+    const feelsLikeCelsius = (weatherData.main.feels_like - 273.15).toFixed(2);
 
     const timestamp = weatherData.dt;
     const timezoneResponse = await fetch(
@@ -27,17 +27,19 @@ async function getWeather(lat, lon, city) {
       timeZone: timezone,
     });
 
+    // First, save to user data, then display from the user
+
     const weatherInfo = document.getElementById("weather-info");
     weatherInfo.innerHTML = `
       <div class="weather-card">
         <p>City: ${weatherData.name}</p>
-        <p>Temperature: ${temperatureCelsius.toFixed(2)}°C</p>
+        <p>Temperature: ${temperatureCelsius}°C</p>
         <p>Description: ${weatherData.weather[0].description}</p>
         <img src="http://openweathermap.org/img/wn/${
           weatherData.weather[0].icon
         }.png" alt="Weather Icon">
         <p>Coordinates: ${weatherData.coord.lat}, ${weatherData.coord.lon}</p>
-        <p>Feels Like: ${feelsLikeCelsius.toFixed(2)}°C</p>
+        <p>Feels Like: ${feelsLikeCelsius}°C</p>
         <p>Humidity: ${weatherData.main.humidity}%</p>
         <p>Pressure: ${weatherData.main.pressure} hPa</p>
         <p>Wind Speed: ${weatherData.wind.speed} m/s</p>
@@ -47,7 +49,7 @@ async function getWeather(lat, lon, city) {
         } mm</p>
         <p>Air Quality Index: ${weatherData.airQualityIndex || "N/A"}</p>
         <p>Date: ${formattedDate}</p>
-        <p id="current-time"></p> <!-- Placeholder for current time -->
+        <p id="current-time"></p>
         <p>Timezone: ${timezone}</p>
       </div>
     `;
@@ -80,9 +82,43 @@ async function getWeather(lat, lon, city) {
       });
       currentTimeElement.textContent = `Current Time: ${currentTime}`;
     }, 1000);
+
+    if (saveData) {
+      const username = getUsernameFromUrl();
+      const weatherDataToSave = {
+        city: city,
+        latitude: lat,
+        longitude: lon,
+        weather: weatherData,
+        timestamp: new Date().toISOString(),
+      };
+      await saveWeatherDataToUser(username, weatherDataToSave);
+    }
   } catch (error) {
     console.error("Error fetching weather data:", error);
   }
+}
+
+
+async function saveWeatherDataToUser(username, weatherData) {
+  try {
+    const response = await fetch(`/users/${username}/weather`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(weatherData),
+    });
+    const responseData = await response.json();
+    console.log(responseData);
+  } catch (error) {
+    console.error("Error saving weather data to user:", error);
+  }
+}
+
+function getUsernameFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('username');
 }
 
 async function getTimezone(lat, lon, timestamp) {
@@ -109,7 +145,7 @@ async function getWeatherByCity() {
   if (geoCodingData.length > 0) {
     const lat = geoCodingData[0].lat;
     const lon = geoCodingData[0].lon;
-    getWeather(lat, lon, city);
+    getWeather(lat, lon, city, true);
   } else {
     alert(`Could not find city named ${city}.`);
   }
@@ -140,7 +176,7 @@ async function getWeatherByCoordinates() {
   }
 
   const city = geoCodingData.address.city;
-  getWeather(lat, lon, city);
+  getWeather(lat, lon, city, true);
 }
 
 async function getCurrentLocationWeather() {
@@ -148,7 +184,7 @@ async function getCurrentLocationWeather() {
     navigator.geolocation.getCurrentPosition(async (position) => {
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
-      getWeather(lat, lon);
+      getWeather(lat, lon, null, true);
     });
   } else {
     alert("Geolocation is not supported by your browser");
@@ -178,7 +214,7 @@ function selectCityOnMap() {
   map.on("click", function (e) {
     const selectedCityLat = e.latlng.lat;
     const selectedCityLon = e.latlng.lng;
-    getWeather(selectedCityLat, selectedCityLon);
+    getWeather(selectedCityLat, selectedCityLon, null, true);
     map.off("click");
   });
 }
@@ -194,3 +230,18 @@ function changeBackgroundImage(description) {
       console.error("Error fetching background image:", error);
     });
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  const urlParams = new URLSearchParams(window.location.search);
+  const username = urlParams.get("username");
+
+  if (username) {
+    const usernameElement = document.getElementById("username");
+    usernameElement.textContent = `Welcome, ${username}!`;
+  }
+
+  const exitButton = document.getElementById("exit-button");
+  exitButton.addEventListener("click", function () {
+    window.location.href = "index.html";
+  });
+});

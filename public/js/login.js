@@ -41,7 +41,7 @@ function registerUser() {
 
 function loginUser() {
   const loginForm = document.getElementById("loginForm");
-  const username = loginForm.querySelector('[name="username"]').value;
+  const email = loginForm.querySelector('[name="email"]').value;
   const password = loginForm.querySelector('[name="password"]').value;
 
   fetch("/login", {
@@ -49,13 +49,13 @@ function loginUser() {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ email, password }),
   })
     .then((response) => response.json())
     .then((data) => {
       console.log(data);
       if (data.success) {
-        alert("Login successful");
+        alert(`Login successful! Welcome ${data.username}.`);
         window.location.href = data.redirectUrl;
       } else {
         alert(data.error);
