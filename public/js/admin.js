@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", async function () {
   try {
-    // Fetch and display existing users
     const response = await fetch("/users");
     const users = await response.json();
     const userList = document.getElementById("user-list");
@@ -64,7 +63,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     console.error("Error fetching users:", error);
   }
 
-  // Handle form submission to add a new user
   const addUserForm = document.getElementById("add-user-form");
   addUserForm.addEventListener("submit", async function (event) {
     event.preventDefault();
@@ -96,9 +94,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
 
       const userData = await response.json();
-      console.log(userData); // Assuming the response includes user data
+      console.log(userData);
 
-      // Display alert and clear input fields
       alert("User created successfully");
       document.getElementById("name").value = "";
       document.getElementById("email").value = "";
@@ -109,7 +106,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       location.reload();
     } catch (error) {
       console.error("Error adding user:", error);
-      // Handle error (e.g., display error message to the user)
     }
   });
 });
@@ -243,3 +239,30 @@ async function toggleAdmin(userId, makeAdmin) {
     console.error("Error toggling admin status:", error);
   }
 }
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  const userId = getUserIdFromUrl();
+  if (userId) {
+    fetch(`/users/${userId}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((user) => {
+        const username = user ? user.name : "User";
+        const usernameElement = document.getElementById("username");
+        usernameElement.textContent = `Welcome, ${username}!`;
+      })
+      .catch((error) => {
+        console.error("Error fetching user data:", error);
+      });
+  }
+
+  const exitButton = document.getElementById("exit-button");
+  exitButton.addEventListener("click", function () {
+    window.location.href = "/";
+  });
+});

@@ -6,20 +6,14 @@ async function getWeather(lat, lon, city) {
   const userId = getUserIdFromUrl();
 
   try {
-    // Fetch weather data from the weather API
     const weatherResponse = await fetch("/weather", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ lat, lon, userId }), // Send latitude and longitude in the request body
+      body: JSON.stringify({ lat, lon, userId }),
     });
     const weatherData = await weatherResponse.json();
-
-    // Save weather data to the user's profile
-    // await saveWeatherDataToUser(userId, weatherData);
-
-    // Fetch weather data from user's profile
     const userWeatherResponse = await fetch(`/users/${userId}/weather`);
     const userWeatherData = await userWeatherResponse.json();
 
@@ -29,7 +23,6 @@ async function getWeather(lat, lon, city) {
 
     const latestWeatherData = userWeatherData[userWeatherData.length - 1];
 
-    // Display weather information
     const temperatureCelsius = (
       latestWeatherData.weather.main.temp - 273.15
     ).toFixed(2);
@@ -50,7 +43,6 @@ async function getWeather(lat, lon, city) {
       timeZone: timezone,
     });
 
-    // Display weather information
     const weatherInfo = document.getElementById("weather-info");
     weatherInfo.innerHTML = `
       <div class="weather-card">
@@ -73,10 +65,8 @@ async function getWeather(lat, lon, city) {
       </div>
     `;
 
-    // Show map
     showMap("map", lat, lon, city, timezone);
 
-    // Set interval for updating current time
     const currentTimeElement = document.getElementById("current-time");
     timeInterval = setInterval(() => {
       const currentTime = new Date().toLocaleTimeString(undefined, {
@@ -89,12 +79,10 @@ async function getWeather(lat, lon, city) {
       currentTimeElement.textContent = `Current Time: ${currentTime}`;
     }, 1000);
 
-    // Change background image based on weather description
     const weatherDescription = latestWeatherData.weather.weather[0].description;
     changeBackgroundImage(weatherDescription);
   } catch (error) {
     console.error("Error fetching weather data:", error);
-    // Handle error
   }
 }
 

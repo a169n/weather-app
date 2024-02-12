@@ -120,12 +120,12 @@ app.post("/register", async (req, res) => {
 });
 
 app.get("/weather", (req, res) => {
-  res.status(200).render("weather")
-})
+  res.status(200).render("weather");
+});
 
 app.get("/admin", (req, res) => {
-  res.status(200).render("admin")
-})
+  res.status(200).render("admin");
+});
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
@@ -134,24 +134,40 @@ app.post("/login", async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(401).json({ success: false, error: "Username not found" });
+      return res
+        .status(401)
+        .json({ success: false, error: "Username not found" });
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
-      return res.status(401).json({ success: false, error: "Username or password does not match" });
+      return res
+        .status(401)
+        .json({ success: false, error: "Username or password does not match" });
     }
 
     if (user.isAdmin) {
       if (req.accepts("json")) {
-        return res.status(200).json({ success: true, redirectUrl: `/admin?userId=${user._id}` }); // Redirect to admin page with userId in the URL
+        return res
+          .status(200)
+          .json({
+            success: true,
+            redirectUrl: `/admin?userId=${user._id}`,
+            username: user.name,
+          });
       } else {
         return res.status(200).render("admin");
       }
     } else {
       if (req.accepts("json")) {
-        return res.status(200).json({ success: true, redirectUrl: `/weather?userId=${user._id}` }); // Redirect to weather page with userId in the URL
+        return res
+          .status(200)
+          .json({
+            success: true,
+            redirectUrl: `/weather?userId=${user._id}`,
+            username: user.name,
+          });
       } else {
         return res.status(200).render("weather");
       }
@@ -161,8 +177,6 @@ app.post("/login", async (req, res) => {
     return res.status(500).json({ success: false, error: "Server error" });
   }
 });
-
-
 
 app.get("/users", async (req, res) => {
   try {

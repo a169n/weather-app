@@ -21,6 +21,12 @@ h1 {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.admin-nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
 /* User list styling */
 #user-list {
   list-style-type: none;
