@@ -170,7 +170,6 @@ Before running the application, make sure you have the following:
   ```bash
   getAirQualityIndex(37.7749, -122.4194);
 
-
 ### 4. TimezoneDB API
 
 - **Endpoint:** `/timezone`
@@ -182,7 +181,6 @@ Before running the application, make sure you have the following:
 
   ```bash
   curl http://localhost:3000/timezone?lat=37.7749&lon=-122.4194&timestamp=1642742400
-
 
 ## Lisence
 
