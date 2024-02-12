@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const getWeatherButton = document.createElement("button");
       getWeatherButton.textContent = "Get Weather Data";
       getWeatherButton.addEventListener("click", () =>
-        getWeatherData(user.name)
+        getWeatherData(user._id)
       );
 
       li.appendChild(getWeatherButton);
@@ -19,9 +19,15 @@ document.addEventListener("DOMContentLoaded", async function () {
       if (!user.isAdmin) {
         const makeAdminButton = document.createElement("button");
         makeAdminButton.textContent = "Make Admin";
-        makeAdminButton.addEventListener("click", () => makeAdmin(user.name));
+        makeAdminButton.addEventListener("click", () => toggleAdmin(user._id, true));
 
         li.appendChild(makeAdminButton);
+      } else {
+        const disableAdminButton = document.createElement("button");
+        disableAdminButton.textContent = "Disable Admin";
+        disableAdminButton.addEventListener("click", () => toggleAdmin(user._id, false));
+
+        li.appendChild(disableAdminButton);
       }
 
       userList.appendChild(li);
@@ -31,20 +37,35 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 });
 
-async function getWeatherData(username) {
+async function getWeatherData(userId) {
   try {
-    const response = await fetch(`/users/${username}/weather`);
+    const response = await fetch(`/users/${userId}/weather`);
     const weatherData = await response.json();
+    console.log(weatherData); // Log the weatherData object
     const weatherDisplay = document.getElementById("weather-data");
+
+    // Clear previous weather data if any
+    weatherDisplay.innerHTML = "";
+
+    // Create elements to display the weather data
+    const weatherInfo = document.createElement("div");
+    weatherInfo.textContent = `City: ${weatherData[0].city}, Weather: ${weatherData[0].weather}, Timestamp: ${weatherData[0].timestamp}`;
+
+    // Append weather info to the weather display element
+    weatherDisplay.appendChild(weatherInfo);
   } catch (error) {
     console.error("Error fetching weather data:", error);
   }
 }
 
-async function makeAdmin(username) {
+
+
+async function toggleAdmin(userId, makeAdmin) {
   try {
-    await fetch(`/users/${username}/makeAdmin`, { method: "POST" });
+    const method = makeAdmin ? "POST" : "DELETE";
+    await fetch(`/users/${userId}/admin`, { method });
+    location.reload();
   } catch (error) {
-    console.error("Error making user admin:", error);
+    console.error("Error toggling admin status:", error);
   }
 }

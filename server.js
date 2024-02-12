@@ -4,7 +4,9 @@ const axios = require("axios");
 const bodyParser = require("body-parser");
 const { connectDB } = require("./config/db");
 const app = express();
+
 const User = require("./models/userSchema");
+const WeatherData = require("./models/weatherDataSchema");
 
 require("dotenv").config();
 
@@ -18,21 +20,27 @@ app.get("/", (req, res) => {
   res.redirect(__dirname + "/login.html");
 });
 
-app.get("/weather", async (req, res) => {
+app.post("/weather", async (req, res) => {
   try {
-    const { lat, lon } = req.query;
+    const { lat, lon, userId } = req.body; // Extract userId from the request body
     const apiKey = process.env.OPENWEATHER_API_KEY;
     const weatherResponse = await axios.get(
       `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`
     );
 
     const weatherData = weatherResponse.data;
-    const airQualityIndex = await getAirQualityIndex(lat, lon);
 
-    res.json({
-      ...weatherData,
-      airQualityIndex: airQualityIndex,
+    // Save weather data to the database along with userId
+    await WeatherData.create({
+      userId: userId,
+      city: weatherData.name,
+      latitude: weatherData.coord.lat,
+      longitude: weatherData.coord.lon,
+      weather: weatherData,
+      timestamp: new Date().toISOString(),
     });
+
+    res.json(weatherData); // Return weather data to the client
   } catch (error) {
     console.error("Error fetching weather data:", error);
     res.status(500).json({
@@ -41,24 +49,6 @@ app.get("/weather", async (req, res) => {
   }
 });
 
-async function getAirQualityIndex(lat, lon) {
-  try {
-    const openAQApiKey = process.env.OPENAQ_API_KEY;
-    const airQualityResponse = await axios.get(
-      `https://api.openaq.org/v2/latest?coordinates=${lat},${lon}&apiKey=${openAQApiKey}`
-    );
-
-    const airQualityData = airQualityResponse.data;
-    const airQualityIndex = airQualityData.results[0].measurements.find(
-      (measurement) => measurement.parameter === "pm25"
-    ).value;
-
-    return airQualityIndex;
-  } catch (error) {
-    console.error("Error fetching air quality data:", error);
-    return "N/A";
-  }
-}
 
 app.get("/background", async (req, res) => {
   try {
@@ -96,7 +86,12 @@ app.get("/timezone", async (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  const { name, email, password, confirmPassword, city, latitude, longitude, weatherData } = req.body;
+  const {
+    name,
+    email,
+    password,
+    confirmPassword,
+  } = req.body;
 
   if (password !== confirmPassword) {
     return res.status(400).json({ error: "Passwords do not match" });
@@ -112,14 +107,11 @@ app.post("/register", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await User.create({ 
-      name, 
-      email, 
-      password: hashedPassword, 
-      city,
-      latitude,
-      longitude,
-      weatherData
+    await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      isAdmin: false,
     });
 
     res.status(201).json({ message: "Registration successful" });
@@ -136,26 +128,29 @@ app.post("/login", async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(401).json({ success: false, error: "Username not found" });
+      return res
+        .status(401)
+        .json({ success: false, error: "Username not found" });
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
-      return res.status(401).json({ success: false, error: "Username or password does not match" });
+      return res
+        .status(401)
+        .json({ success: false, error: "Username or password does not match" });
     }
 
-    res.status(200).json({ 
-      success: true, 
-      username: user.name, 
-      redirectUrl: "/weather.html?username=" + user.name 
+    res.status(200).json({
+      success: true,
+      username: user.name,
+      redirectUrl: "/weather.html?userId=" + user._id,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: "Server error" });
   }
 });
-
 
 app.get("/users", async (req, res) => {
   try {
@@ -167,20 +162,71 @@ app.get("/users", async (req, res) => {
   }
 });
 
-app.post('/users/:username/weather', async (req, res) => {
-  const { username } = req.params;
+app.get("/users/:userId", async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.get("/users/:userId/weather", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const weatherData = await WeatherData.find({ userId });
+
+    if (!weatherData || weatherData.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "Weather data not found for this user" });
+    }
+
+    res.status(200).json(weatherData);
+  } catch (error) {
+    console.error("Error fetching weather data from user:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.post("/users/:userId/weather", async (req, res) => {
+  const { userId } = req.params;
   const { city, latitude, longitude, weather, timestamp } = req.body;
 
   try {
-    const user = await User.findOne({ name: username });
+    // Retrieve the user by ID
+    const user = await User.findById(userId);
 
-    user.weatherData.push({ city, latitude, longitude, weather, timestamp });
-    await user.save();
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
-    res.status(200).json({ message: 'Weather data saved successfully' });
+    // Create a new WeatherData document with userId included
+    const newWeatherData = await WeatherData.create({
+      userId: userId, // Include the userId
+      city,
+      latitude,
+      longitude,
+      weather,
+      timestamp,
+    });
+
+    res.status(200).json(newWeatherData);
   } catch (error) {
-    console.error('Error saving weather data to user:', error);
-    res.status(500).json({ error: 'Server error' });
+    console.error("Error saving weather data to user:", error);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -200,6 +246,37 @@ app.post("/users/:userId/admin", async (req, res) => {
     res.status(200).json({ message: `User ${user.name} is now Admin` });
   } catch (error) {
     console.error("Error making user admin:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.delete("/weathers", async (req, res) => {
+  try {
+    await WeatherData.deleteMany();
+
+    res.status(200).json({ message: "All weather data cleared successfully." });
+  } catch (error) {
+    console.error("Error clearing weather data:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.delete("/users/:userId/admin", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    user.isAdmin = false;
+    await user.save();
+
+    res.status(200).json({ message: `User ${user.name} is no longer Admin` });
+  } catch (error) {
+    console.error("Error removing admin privileges:", error);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -227,7 +304,6 @@ app.delete("/users/:id", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-
 
 const port = process.env.PORT || 3000;
 
