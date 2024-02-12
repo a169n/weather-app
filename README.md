@@ -31,62 +31,62 @@ Before running the application, make sure you have the following:
   - [TimezoneDB](https://timezonedb.com/api)
 
 ## Endpoints
-1. GET /:
+1. ```GET "/"```
    - Renders the index page.
 
-2. POST /weather:
+2. ```POST "/weather"```
    - Fetches weather data based on latitude, longitude, and user ID.
    - Saves the weather data in the database.
 
-3. GET /background:
+3. ```GET "/background"```
    - Fetches a random background image based on a query parameter.
 
-4. GET /timezone:
+4. ```GET "/timezone"```
    - Fetches timezone data based on latitude, longitude, and timestamp.
 
-5. POST /register:
+5. ```POST "/register"```
    - Registers a new user.
    - Checks if passwords match.
    - Hashes the password before saving it to the database.
 
-6. GET /weather:
+6. ```GET "/weather"```
    - Renders the weather page.
 
-7. GET /admin:
+7. ```GET "/admin"```
    - Renders the admin page.
 
-8. POST /login:
+8. ```POST "/login"```
    - Logs in a user.
    - Checks credentials and redirects to the appropriate page based on user type (admin or regular user).
 
-9. GET /users:
+9. ```GET "/users"```
    - Retrieves all users from the database.
 
-10. GET /users/:userId:
+10. ```GET "/users/:userId"```
     - Retrieves a specific user by ID.
 
-11. GET /users/:userId/weather:
+11. ```GET "/users/:userId/weather"```
     - Retrieves weather data for a specific user by ID.
 
-12. PUT /users/:userId:
+12. ```PUT "/users/:userId"```
     - Updates user information.
 
-13. POST /users/:userId/weather:
+13. ```POST "/users/:userId/weather"```
     - Saves weather data for a specific user.
 
-14. POST /users/:userId/admin:
+14. ```POST "/users/:userId/admin"```
     - Grants admin privileges to a user.
 
-15. DELETE /weathers:
+15. ```DELETE "/weathers"```
     - Deletes all weather data.
 
-16. DELETE /users/:userId/admin:
+16. ```DELETE "/users/:userId/admin"```
     - Removes admin privileges from a user.
 
-17. DELETE /users:
+17. ```DELETE "/users"```
     - Deletes all users.
 
-18. DELETE /users/:id:
+18. ```DELETE "/users/:id"```
     - Deletes a specific user by ID.
 
 
