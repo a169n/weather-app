@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Page</title>
+  <link rel="stylesheet" href="../css/admin.css" />
+  <!-- Include component-specific CSS files -->
+  <link rel="stylesheet" href="./adminComponents/addUserForm/addUserForm.css" />
+  <link rel="stylesheet" href="./adminComponents/userList/userList.css" />
+  <link rel="stylesheet" href="./adminComponents/weatherHistory/weatherHistory.css" />
+</head>
+<body>
+  <h1>Admin Page</h1>
+
+  <!-- Include Add User Form component -->
+  <%- include('./adminComponents/addUserForm.ejs') %>
+
+  <h2>All Users:</h2>
+  <!-- Include User List component -->
+  <%- include('./adminComponents/userList.ejs') %>
+
+  <h2>User Weather History:</h2>
+  <!-- Include Weather History component -->
+  <%- include('./adminComponents/weatherHistory.ejs') %>
+
+  <script src="../js/admin.js"></script>
+</body>
+</html>

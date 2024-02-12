@@ -1,0 +1,30 @@
+<div id="loginForm" style="display: none">
+  <h2>Login</h2>
+  <form
+    action="/login"
+    method="post"
+    id="loginForm"
+    onsubmit="return loginUser()"
+  >
+    <div class="input-box">
+      <input type="text" name="email" placeholder="Enter your email" required />
+    </div>
+    <div class="input-box">
+      <input
+        type="password"
+        name="password"
+        placeholder="Enter your password"
+        required
+      />
+    </div>
+    <div class="input-box button">
+      <input type="submit" value="Login" />
+    </div>
+    <div class="text">
+      <h3>
+        Do not have an account?
+        <a href="#" onclick="toggleForm('registrationForm')">Register now!</a>
+      </h3>
+    </div>
+  </form>
+</div>

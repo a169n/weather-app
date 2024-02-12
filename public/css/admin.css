@@ -1,0 +1,144 @@
+body {
+  font-family: Poppins, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f2f2f2;
+  padding: 50px 200px;
+}
+
+/* Header styling */
+h1 {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Main content container */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* User list styling */
+#user-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+#user-list li {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+}
+
+/* User info styling */
+.user-info p {
+  margin: 5px 0;
+}
+
+/* Buttons styling */
+button {
+  cursor: pointer;
+  padding: 5px 10px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 3px;
+  background-color: #007bff;
+  color: #fff;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Weather data styling */
+#weather-data {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+#weather-data p {
+  margin: 5px 0;
+}
+
+
+#weather-data li {
+  margin-bottom: 10px;
+}
+
+.show-weather-data {
+  display: block;
+}
+
+.hide-weather-data {
+  display: none;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 400px;
+}
+
+.input-box {
+  margin-bottom: 20px;
+}
+
+.input-box input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  
+}
+
+.policy {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.policy input {
+  margin-right: 10px;
+}
+
+.policy h3 {
+  margin: 0;
+}
+
+.button input {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button input:hover {
+  background-color: #0056b3;
+}
+
+.text {
+  text-align: center;
+}
+
+.input-element {
+  margin: 4px 0;
+}

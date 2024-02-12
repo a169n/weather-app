@@ -186,8 +186,8 @@ function selectCityOnMap() {
   map.on("click", async function (e) {
     const selectedCityLat = e.latlng.lat;
     const selectedCityLon = e.latlng.lng;
-    const city = await getCityFromCoordinates(selectedCityLat, selectedCityLon)
-    console.log(city)
+    const city = await getCityFromCoordinates(selectedCityLat, selectedCityLon);
+    console.log(city);
     getWeather(selectedCityLat, selectedCityLon, city);
     map.off("click");
   });
@@ -227,6 +227,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const exitButton = document.getElementById("exit-button");
   exitButton.addEventListener("click", function () {
-    window.location.href = "index.html";
+    window.location.href = "/";
   });
 });
