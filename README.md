@@ -5,6 +5,12 @@ A simple weather application with registration/login system that provides weathe
 ## Admin Panel
 
 - You can access the admin panel using the following credentials:
+
+```bash
+Email: a1byn.talgat05@gmail.com
+Password: 123
+```
+OR
 ```bash
 Email: admin
 Password: admin
@@ -16,47 +22,8 @@ Password: admin
 * View a list of registered users.
 * Edit user profiles.
 * Delete user accounts.
-* Grant or revoke privileges.
+* Grant or revoke admin privileges.
 * Authorization and Authentication:
-
-## Installation
-
-1. **Clone the repository:**
-
-   ```bash
-   https://github.com/a169n/weather-app.git
-
-2. **Navigate to the project directory:**
-
-   ```bash
-   cd your-repo
-
-1. **Install the required npm packages:**
-
-   ```bash
-   npm install
-
-## Configuration
-
-1. **Create a .env file in the root directory of the project.**
-
-2. **Add the following environment variables to the .env file:**
-    ```bash
-    PORT = 3000
-    MONGO_URI = mongodb+srv://a1byn:a169n005@daryntech.jxuelry.mongodb.net/weather_db?retryWrites=true&w=majority
-    OPENWEATHER_API_KEY = 751f1880e357af46026e44fa855dd102
-    UNSPLASH_API_KEY = SOA6Q1M5Q4FzVBAWGg0JhyNIHjKfqGzbbDljY5GGfJY
-    OPENAQ_API_KEY = a27ef85d31480c5cd8036e54d56d14de5a6842415ee9899f24e39605d32836f9
-    TIMEZONE_DB_API_KEY = BB5CW5D7IZBX
-
-## Running the application
-
-1. **Start the server**
-    ```bash
-    npm run dev
-    
-**The server will be running at http://localhost:3000**
-
 
 ## Endpoints
 1. ```GET "/"```
@@ -116,6 +83,44 @@ Password: admin
 
 18. ```DELETE "/users/:id"```
     - Deletes a specific user by ID.
+
+## Installation
+
+1. **Clone the repository:**
+
+   ```bash
+   https://github.com/a169n/weather-app.git
+
+2. **Navigate to the project directory:**
+
+   ```bash
+   cd your-repo
+
+1. **Install the required npm packages:**
+
+   ```bash
+   npm install
+
+## Configuration
+
+1. **Create a .env file in the root directory of the project.**
+
+2. **Add the following environment variables to the .env file:**
+    ```bash
+    PORT = 3000
+    MONGO_URI = mongodb+srv://a1byn:a169n005@daryntech.jxuelry.mongodb.net/weather_db?retryWrites=true&w=majority
+    OPENWEATHER_API_KEY = 751f1880e357af46026e44fa855dd102
+    UNSPLASH_API_KEY = SOA6Q1M5Q4FzVBAWGg0JhyNIHjKfqGzbbDljY5GGfJY
+    OPENAQ_API_KEY = a27ef85d31480c5cd8036e54d56d14de5a6842415ee9899f24e39605d32836f9
+    TIMEZONE_DB_API_KEY = BB5CW5D7IZBX
+
+## Running the application
+
+1. **Start the server**
+    ```bash
+    npm run dev
+    
+**The server will be running at http://localhost:3000**
 
 ## Usage
 
