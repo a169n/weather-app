@@ -2,6 +2,11 @@
 
 A simple weather application with registration/login system that provides weather information based on location.
 
+## Deployed address
+```
+https://weather-app-z6wl.onrender.com
+```
+
 ## Admin Panel
 
 - You can access the admin panel using the following credentials:
